@@ -1,6 +1,8 @@
-import com.example.oauthtest.service.kakaoAccessTokenUrl
+
 package com.example.oauthtest.service
 
+import org.springframework.http.MediaType
+import com.example.oauthtest.service.kakaoAccessTokenUrl
 
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -40,18 +42,19 @@ class KakaoService {
     private val clientId = "auth_client_id"
 
     //redirect 되는 urk
-    private val redirectUrl = "http://localhost:8777/oauthSvc/authorize"
+    val redirectUrl = "http://localhost:8777/oauthSvc/authorize"
 
     //응답 type
-    private val responseType = "code"
+    val responseType = "code"
 
     //요청 url
-    private val requestUrl = "https://kauth,kakao.com/oauth/authorize"
+    val requestUrl = "https://kauth,kakao.com/oauth/authorize"
 
     //토큰 link
-    private val tokenUrl = "https://kauth.kakao.com/oauth/token"
+    val accessTokenUrl = "https://kauth.kakao.com/oauth/token"
 
-
+    //client secret value
+    val clientSecret = "insert client secret"
 
     //RestTemplate
 
@@ -66,11 +69,11 @@ class KakaoService {
 
     //요청
     fun getAuthorizationUrl(state: String): String {
-        val builder = DefaultUriBuilderFactory(kakaoRequestUrl)
-            .builer()
-            .queryParam("auth_client_id", kakaoClientid)
-            .queryParam("redirect_uri", kakaoRedirectUri)
-            .queryParam("response_type", kakaoResponseType)
+        val builder = DefaultUriBuilderFactory(requestUrl)
+            .builder()
+            .queryParam("auth_client_id", clientId)
+            .queryParam("redirect_uri", redirectUrl)
+            .queryParam("response_type", responseType)
             .queryParam("state", state)
         return builder.build().toString()
     }
@@ -79,7 +82,7 @@ class KakaoService {
     fun getAccessToken(code: String, kakaoRedirectUri: String?, kakaoClientid: String?) :Map<String, Any> {
         val headers = HttpHeaders()
 
-        headers.contentType = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
         val params = LinkedMultiValueMap<String, String>()
 
@@ -90,7 +93,7 @@ class KakaoService {
         params.add("code", code)
 
         val request = HttpEntity(params,headers)
-        val response = restTemplate().exchange(kakaoAccessTokenUrl, HttpMethod.POST, request, String::class.java)
+        val response = RestTemplate().exchange(accessTokenUrl, HttpMethod.POST, request, String::class.java)
             val objectMapper = ObjectMapper()
         return objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
 
@@ -103,7 +106,7 @@ class KakaoService {
         headers.add("Authorization", "Bearer $accessToken")
 
         val request = HttpEntity("", headers)
-        val response = restTemplate().exchange(kakaouserInfoUrl, HttpMethod.GET, request, String::class.java)
+        val response = restTemplate().exchange(userInfoUrl, HttpMethod.GET, request, String::class.java)
         val objectMapper = ObjectMapper()
         return objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
 
@@ -111,6 +114,8 @@ class KakaoService {
 
 
 }
+
+
 
 /*
 private fun Any.toUrlString(): String {
