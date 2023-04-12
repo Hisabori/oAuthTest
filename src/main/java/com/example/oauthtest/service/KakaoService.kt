@@ -2,7 +2,6 @@
 package com.example.oauthtest.service
 
 import org.springframework.http.MediaType
-import com.example.oauthtest.service.kakaoAccessTokenUrl
 
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -37,7 +36,6 @@ private const val userInfoUrl = "https://kapi.kakao.com/v2/user/me"
 class KakaoService {
 
 
-
     //클라이언트 id
     private val clientId = "auth_client_id"
 
@@ -58,12 +56,12 @@ class KakaoService {
 
     //RestTemplate
 
-    fun restTemplate(): RestTemplate{
+    fun restTemplate(): RestTemplate {
         val restTemplate = RestTemplate(HttpComponentsClientHttpRequestFactory())
         restTemplate.uriTemplateHandler = DefaultUriBuilderFactory()
 
         //UTF-8 인코딩
-        restTemplate.messageConverters.add(0,StringHttpMessageConverter(Charset.forName("UTF-8")))
+        restTemplate.messageConverters.add(0, StringHttpMessageConverter(Charset.forName("UTF-8")))
         return restTemplate
     }
 
@@ -79,7 +77,7 @@ class KakaoService {
     }
 
     //access token 요청
-    fun getAccessToken(code: String, kakaoRedirectUri: String?, kakaoClientid: String?) :Map<String, Any> {
+    fun getAccessToken(code: String): Map<String, Any> {
         val headers = HttpHeaders()
 
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
@@ -92,13 +90,23 @@ class KakaoService {
         params.add("redirect_uri", kakaoRedirectUri)
         params.add("code", code)
 
-        val request = HttpEntity(params,headers)
+        val request = HttpEntity(params, headers)
         val response = RestTemplate().exchange(accessTokenUrl, HttpMethod.POST, request, String::class.java)
-            val objectMapper = ObjectMapper()
-        return objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
+        val objectMapper = ObjectMapper()
+
+        val result: Map<String, Any> =
+            objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
+            //예외 처리
+            //GetAccessToken 메소드에서 access token 필드가 존재 하는지 확인 -> 없을 경우 예외 처리
+            if (!result.containsKey("Access_Token")){
+                throw RuntimeException("토큰값 $result 을(를) 가져오는 중 예외가 발생 하여 실패하였습니다. (error: $result)")
+            }
+        //결과값 리턴
+        return result
+
+        //return objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
 
     }
-
 
    //사용자 정보 가져오기
     fun getUserInfo(accessToken: String):Map<String,Any>{

@@ -1,20 +1,21 @@
-@Controller
-
 package com.example.oauthtest.controller
 
+import com.example.oauthtest.service.KakaoService
+import org.springframework.ui.Model
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+@Controller
 class KakaoLoginController {
 
 
     @Autowired
-    lateinit var KakkaoService: KakaoService
+    lateinit var KakaoService: KakaoService
 
     @RequestMapping("/login")
     fun KakaoLogin(request: HttpServletRequest, model: Model):String{
 
-        val redirectUrl = KakaoService.getAuthorizationUrl(request)
+        val redirectUrl = KakaoService.getAuthorizationUrl(request.toString())
         model.addAttribute("url",redirectUrl)
 
         //return 'URL'
@@ -31,7 +32,7 @@ class KakaoLoginController {
         val token = KakaoService.getAccessToken(code)
         val userInfo = KakaoService.getUserInfo(token["access_token"] as String)
 
-        if(userInfo ["email" == null]){
+        if(userInfo ["email"] == null as Boolean){
             return "redirect:/login?error=email"
         } else{
             val email = userInfo["email"] as String
