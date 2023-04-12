@@ -1,6 +1,7 @@
-import com.example.oauthtest.service.kakaoAccessTokenUrl
+
 package com.example.oauthtest.service
 
+import org.springframework.http.MediaType
 
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -35,51 +36,51 @@ private const val userInfoUrl = "https://kapi.kakao.com/v2/user/me"
 class KakaoService {
 
 
-
     //클라이언트 id
     private val clientId = "auth_client_id"
 
     //redirect 되는 urk
-    private val redirectUrl = "http://localhost:8777/oauthSvc/authorize"
+    val redirectUrl = "http://localhost:8777/oauthSvc/authorize"
 
     //응답 type
-    private val responseType = "code"
+    val responseType = "code"
 
     //요청 url
-    private val requestUrl = "https://kauth,kakao.com/oauth/authorize"
+    val requestUrl = "https://kauth,kakao.com/oauth/authorize"
 
     //토큰 link
-    private val tokenUrl = "https://kauth.kakao.com/oauth/token"
+    val accessTokenUrl = "https://kauth.kakao.com/oauth/token"
 
-
+    //client secret value
+    val clientSecret = "insert client secret"
 
     //RestTemplate
 
-    fun restTemplate(): RestTemplate{
+    fun restTemplate(): RestTemplate {
         val restTemplate = RestTemplate(HttpComponentsClientHttpRequestFactory())
         restTemplate.uriTemplateHandler = DefaultUriBuilderFactory()
 
         //UTF-8 인코딩
-        restTemplate.messageConverters.add(0,StringHttpMessageConverter(Charset.forName("UTF-8")))
+        restTemplate.messageConverters.add(0, StringHttpMessageConverter(Charset.forName("UTF-8")))
         return restTemplate
     }
 
     //요청
     fun getAuthorizationUrl(state: String): String {
-        val builder = DefaultUriBuilderFactory(kakaoRequestUrl)
-            .builer()
-            .queryParam("auth_client_id", kakaoClientid)
-            .queryParam("redirect_uri", kakaoRedirectUri)
-            .queryParam("response_type", kakaoResponseType)
+        val builder = DefaultUriBuilderFactory(requestUrl)
+            .builder()
+            .queryParam("auth_client_id", clientId)
+            .queryParam("redirect_uri", redirectUrl)
+            .queryParam("response_type", responseType)
             .queryParam("state", state)
         return builder.build().toString()
     }
 
     //access token 요청
-    fun getAccessToken(code: String, kakaoRedirectUri: String?, kakaoClientid: String?) :Map<String, Any> {
+    fun getAccessToken(code: String): Map<String, Any> {
         val headers = HttpHeaders()
 
-        headers.contentType = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
         val params = LinkedMultiValueMap<String, String>()
 
@@ -89,13 +90,23 @@ class KakaoService {
         params.add("redirect_uri", kakaoRedirectUri)
         params.add("code", code)
 
-        val request = HttpEntity(params,headers)
-        val response = restTemplate().exchange(kakaoAccessTokenUrl, HttpMethod.POST, request, String::class.java)
-            val objectMapper = ObjectMapper()
-        return objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
+        val request = HttpEntity(params, headers)
+        val response = RestTemplate().exchange(accessTokenUrl, HttpMethod.POST, request, String::class.java)
+        val objectMapper = ObjectMapper()
+
+        val result: Map<String, Any> =
+            objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
+            //예외 처리
+            //GetAccessToken 메소드에서 access token 필드가 존재 하는지 확인 -> 없을 경우 예외 처리
+            if (!result.containsKey("Access_Token")){
+                throw RuntimeException("토큰값 $result 을(를) 가져오는 중 예외가 발생 하여 실패하였습니다. (error: $result)")
+            }
+        //결과값 리턴
+        return result
+
+        //return objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
 
     }
-
 
    //사용자 정보 가져오기
     fun getUserInfo(accessToken: String):Map<String,Any>{
@@ -103,7 +114,7 @@ class KakaoService {
         headers.add("Authorization", "Bearer $accessToken")
 
         val request = HttpEntity("", headers)
-        val response = restTemplate().exchange(kakaouserInfoUrl, HttpMethod.GET, request, String::class.java)
+        val response = restTemplate().exchange(userInfoUrl, HttpMethod.GET, request, String::class.java)
         val objectMapper = ObjectMapper()
         return objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
 
@@ -111,6 +122,8 @@ class KakaoService {
 
 
 }
+
+
 
 /*
 private fun Any.toUrlString(): String {
