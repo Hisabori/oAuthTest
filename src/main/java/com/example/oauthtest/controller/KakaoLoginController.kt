@@ -29,7 +29,7 @@ class KakaoLoginController {
     fun kakaoCallback(@RequestParam("code") code: String, request: HttpServletRequest, response: HttpServletResponse): String{
 
         //Kauth_Token_Access
-        val token = KakaoService.getAccessToken(code)
+        val token = KakaoService.getAccessToken(code,)
         val userInfo = KakaoService.getUserInfo(token["access_token"] as String)
 
         if(userInfo ["email"] == null as Boolean){

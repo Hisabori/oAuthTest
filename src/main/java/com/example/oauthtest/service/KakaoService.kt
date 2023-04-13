@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 
-import java.util.*
-
 //Jackson Library 추가
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -77,7 +75,7 @@ class KakaoService {
     }
 
     //access token 요청
-    fun getAccessToken(code: String): Map<String, Any> {
+    fun getAccessToken(code: String, kakaoClientid: String?, kakaoRedirectUri: String?): Map<String, Any> {
         val headers = HttpHeaders()
 
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
