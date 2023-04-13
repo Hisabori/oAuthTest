@@ -75,7 +75,7 @@ class KakaoService {
     }
 
     //access token 요청
-    fun getAccessToken(code: String, kakaoClientid: String?, kakaoRedirectUri: String?): Map<String, Any> {
+    fun getAccessToken(code: String, kakaoClientid: String?, kakaoRedirectUri: String?): Map<String, Any>? {
         val headers = HttpHeaders()
 
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
@@ -92,13 +92,15 @@ class KakaoService {
         val response = RestTemplate().exchange(accessTokenUrl, HttpMethod.POST, request, String::class.java)
         val objectMapper = ObjectMapper()
 
-        val result: Map<String, Any> =
+        val result: Map<String, Any>? =
             objectMapper.readValue(response.body, object : TypeReference<Map<String, Any>>() {})
             //예외 처리
             //GetAccessToken 메소드에서 access token 필드가 존재 하는지 확인 -> 없을 경우 예외 처리
+        if (result != null) {
             if (!result.containsKey("Access_Token")){
                 throw RuntimeException("토큰값 $result 을(를) 가져오는 중 예외가 발생 하여 실패하였습니다. (error: $result)")
             }
+        }
         //결과값 리턴
         return result
 
@@ -107,7 +109,7 @@ class KakaoService {
     }
 
    //사용자 정보 가져오기
-    fun getUserInfo(accessToken: String):Map<String,Any>{
+    fun getUserInfo(accessToken: String): Map<String, Any>? {
         val headers = org.springframework.http.HttpHeaders()
         headers.add("Authorization", "Bearer $accessToken")
 
@@ -121,6 +123,13 @@ class KakaoService {
 
 }
 
+private operator fun Unit.not(): Boolean {
+    TODO("Not yet implemented")
+}
+
+private fun Unit.containsKey(s: String) {
+
+}
 
 
 /*
