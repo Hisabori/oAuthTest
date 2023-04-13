@@ -29,7 +29,7 @@ class KakaoLoginController {
     fun kakaoCallback(@RequestParam("code") code: String, request: HttpServletRequest, response: HttpServletResponse): String{
 
         //Kauth_Token_Access
-        val token = KakaoService.getAccessToken(code, request, response)
+        val token = getAccessToken(code)
         val userInfo = KakaoService.getUserInfo(token?.get("access_token") as String)
 
         if(userInfo?.get("email") == null as Boolean){
@@ -41,4 +41,13 @@ class KakaoLoginController {
             return "redirect:/home"
         }
     }
+
+    private fun getAccessToken(code: String) {
+
+    }
 }
+
+private fun Any.get(s: String) {
+
+}
+
