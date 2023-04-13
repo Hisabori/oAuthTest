@@ -29,13 +29,13 @@ class KakaoLoginController {
     fun kakaoCallback(@RequestParam("code") code: String, request: HttpServletRequest, response: HttpServletResponse): String{
 
         //Kauth_Token_Access
-        val token = KakaoService.getAccessToken(code,)
-        val userInfo = KakaoService.getUserInfo(token["access_token"] as String)
+        val token = KakaoService.getAccessToken(code, request, response)
+        val userInfo = KakaoService.getUserInfo(token?.get("access_token") as String)
 
-        if(userInfo ["email"] == null as Boolean){
+        if(userInfo?.get("email") == null as Boolean){
             return "redirect:/login?error=email"
         } else{
-            val email = userInfo["email"] as String
+            val email = userInfo?.get("email") as String
 
             //Kauth_Proc_Success (Kakao 로그인 성공 시:)
             return "redirect:/home"

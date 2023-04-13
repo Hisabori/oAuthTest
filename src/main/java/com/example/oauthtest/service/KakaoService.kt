@@ -75,7 +75,7 @@ class KakaoService {
     }
 
     //access token 요청
-    fun getAccessToken(code: String, kakaoClientid: String?, kakaoRedirectUri: String?): Map<String, Any>? {
+    fun getAccessToken(code: String, kakaoRedirectUri: String?, kakaoClientid: String?): Map<String, Any>? {
         val headers = HttpHeaders()
 
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
