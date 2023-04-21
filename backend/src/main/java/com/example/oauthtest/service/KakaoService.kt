@@ -35,7 +35,17 @@ class KakaoService {
 
 
     //클라이언트 id
-    private val clientId = "auth_client_id"
+    //private val clientId = "auth_client_id"
+
+    //client id 하드 코딩 이슈 수정
+    val clientid =  System.getenv("CLIENT_ID")
+
+    //client secret value
+    //val clientSecret = "insert client secret"
+
+    //secret key 하드 코딩 이슈 수정
+    val clientSecret = System.getenv("CLIENT_SECRET")
+
 
     //redirect 되는 urk
     val redirectUrl = "http://localhost:8777/oauthSvc/authorize"
@@ -49,8 +59,8 @@ class KakaoService {
     //토큰 link
     val accessTokenUrl = "https://kauth.kakao.com/oauth/token"
 
-    //client secret value
-    val clientSecret = "insert client secret"
+
+
 
     //RestTemplate
 
