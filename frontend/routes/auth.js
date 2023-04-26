@@ -18,6 +18,29 @@ $(document).ready(function() {
     });
 
     //kakao OAuth Callback
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     router.get("/kakao/callback", async(req, res) => {
         const AUTH_CODE =  req.query.code;
         const REDIRECT_URI = 'http://${req.headers.host}auth/kakao/callback';
