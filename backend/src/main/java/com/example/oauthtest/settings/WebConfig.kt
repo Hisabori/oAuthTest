@@ -1,18 +1,20 @@
-import org.springframework.context.annotation.AnnotationConfigRegistry
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.servlet.config.annotation.CoreRegistry
-import org.springframwork.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-class WebConfig: WebMvcConfigurer{
-    override fun addCoreMappings(registry: CoreRegistry){
+class WebConfig : WebMvcConfigurer {
+    override fun addCorsMappings(registry: CorsRegistry) {
 
-        //전체 endpoint에 CORS 설정을 적용함
+        //모든 Endpoint에 CORS 설정 적용
         registry.addMapping("/**")
 
-            //frontend url
+            // Frontend URL
             .allowedOrigins("http://localhost:8077")
 
-            .allowedMethods("GET", "POST", "PUT",)
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+            .allowCredentials(true)
+            .allowedHeaders("*")
+            .maxAge(3600L)
     }
 }
