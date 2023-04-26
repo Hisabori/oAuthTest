@@ -5,16 +5,24 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class WebConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
-
-        //모든 Endpoint에 CORS 설정 적용
+        // Add a mapping for all endpoints.
+        //모든 endpoint에 지정
         registry.addMapping("/**")
 
-            // Frontend URL
-            .allowedOrigins("http://localhost:8077")
+        // Allow all origins
 
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-            .allowCredentials(true)
-            .allowedHeaders("*")
-            .maxAge(3600L)
+        registry.allowedOrigins("*")
+
+        // Allow all methods.
+        registry.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+
+        // Allow all headers.
+        registry.allowedHeaders("*")
+
+        // Allow credentials.
+        registry.allowCredentials(true)
+
+        // Set the max age of the CORS response.
+        registry.maxAge(3600L)
     }
 }
